@@ -1,0 +1,1735 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Feed Me Up | Noticias España</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="application-name" content="Feed Me Up">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Feed Me Up">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#c9382a">
+    <meta name="msapplication-TileColor" content="#c9382a">
+    <meta name="description" content="Monitor de noticias de medios españoles en tiempo real">
+    
+    <!-- PWA Icons (Base64 embedded) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect fill='%23c9382a' width='512' height='512' rx='80'/%3E%3Ctext x='256' y='340' font-family='Georgia,serif' font-size='280' font-weight='bold' fill='white' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect fill='%23c9382a' width='512' height='512' rx='80'/%3E%3Ctext x='256' y='340' font-family='Georgia,serif' font-size='280' font-weight='bold' fill='white' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+    
+    <!-- Manifest embebido -->
+    <link rel="manifest" href="data:application/json,%7B%22name%22%3A%22Feed%20Me%20Up%22%2C%22short_name%22%3A%22FeedMeUp%22%2C%22description%22%3A%22Monitor%20de%20noticias%20de%20medios%20espa%C3%B1oles%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23fafafa%22%2C%22theme_color%22%3A%22%23c9382a%22%2C%22orientation%22%3A%22portrait-primary%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%2520viewBox%3D'0%25200%2520512%2520512'%253E%253Crect%2520fill%3D'%2523c9382a'%2520width%3D'512'%2520height%3D'512'%2520rx%3D'80'%2F%253E%253Ctext%2520x%3D'256'%2520y%3D'340'%2520font-family%3D'Georgia%2Cserif'%2520font-size%3D'280'%2520font-weight%3D'bold'%2520fill%3D'white'%2520text-anchor%3D'middle'%253EF%253C%2Ftext%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-primary: #fafafa;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f5f5f5;
+            --text-primary: #1a1a1a;
+            --text-secondary: #555555;
+            --text-muted: #888888;
+            --accent: #c9382a;
+            --accent-dim: #a52d22;
+            --accent-light: #fdf2f1;
+            --border: #e5e5e5;
+            --border-light: #d0d0d0;
+            --success: #22c55e;
+            --error: #ef4444;
+            --shadow: 0 2px 12px rgba(0,0,0,0.08);
+            --shadow-hover: 0 8px 24px rgba(0,0,0,0.12);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --safe-top: env(safe-area-inset-top);
+            --safe-bottom: env(safe-area-inset-bottom);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100%;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            padding-top: var(--safe-top);
+            padding-bottom: var(--safe-bottom);
+        }
+
+        /* PWA Install Banner */
+        .install-banner {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            z-index: 500;
+            animation: slideUp 0.4s ease;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .install-banner.show {
+            display: block;
+        }
+
+        .install-banner-content {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .install-banner-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--accent);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            font-family: Georgia, serif;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .install-banner-text {
+            flex: 1;
+        }
+
+        .install-banner-text h4 {
+            font-size: 1rem;
+            margin-bottom: 2px;
+        }
+
+        .install-banner-text p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .install-banner-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .install-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .install-btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .install-btn-secondary {
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+
+        .logo h1 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        .logo h1 span {
+            color: var(--accent);
+        }
+
+        .logo-tag {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+        }
+
+        .status-dot.loading {
+            background: var(--accent);
+            animation: pulse 1s ease infinite;
+        }
+
+        .status-dot.error {
+            background: var(--error);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-dim);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-light);
+        }
+
+        /* Category Nav */
+        .category-nav {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .category-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-nav-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 8px;
+        }
+
+        .category-tab {
+            padding: 8px 16px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .category-tab:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-light);
+        }
+
+        .category-tab.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .category-count {
+            font-size: 0.75rem;
+            background: rgba(0,0,0,0.1);
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        .category-tab.active .category-count {
+            background: rgba(255,255,255,0.25);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+        }
+
+        .news-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .news-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--border-light);
+        }
+
+        .news-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            gap: 12px;
+        }
+
+        .news-source {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .source-icon {
+            width: 28px;
+            height: 28px;
+            background: var(--accent-light);
+            color: var(--accent);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .source-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .news-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .news-card h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .news-card p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .news-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .news-category-tag {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .news-link {
+            color: var(--accent);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Config Modal */
+        .config-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .config-overlay.active {
+            display: flex;
+        }
+
+        .config-panel {
+            background: var(--bg-secondary);
+            border-radius: var(--radius) var(--radius) 0 0;
+            width: 100%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .config-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .config-header h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .config-close {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: var(--bg-primary);
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .config-close:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .config-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .config-section {
+            margin-bottom: 24px;
+        }
+
+        .config-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .config-section h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 8px;
+        }
+
+        .media-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .media-item:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .media-item.selected {
+            background: var(--accent-light);
+            border-color: var(--accent);
+        }
+
+        .media-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border-light);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+        .media-item.selected .media-checkbox {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .media-item.selected .media-checkbox::after {
+            content: '✓';
+            color: white;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .media-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .media-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .config-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .config-action-btn {
+            padding: 6px 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .config-action-btn:hover {
+            background: var(--bg-card-hover);
+        }
+
+        /* Article Modal */
+        .article-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 300;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .article-overlay.active {
+            display: flex;
+        }
+
+        .article-panel {
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .article-header {
+            padding: 24px 24px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .article-source-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .article-header h2 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.4rem;
+            line-height: 1.3;
+        }
+
+        .article-body {
+            padding: 24px;
+        }
+
+        .article-description {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .article-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .article-link-btn {
+            padding: 12px 24px;
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .article-link-btn:hover {
+            background: var(--accent-dim);
+        }
+
+        .article-close-btn {
+            padding: 12px 24px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .article-close-btn:hover {
+            background: var(--bg-card-hover);
+        }
+
+        /* Empty/Loading States */
+        .state-container {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .state-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        .state-container h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
+
+        .state-container p {
+            color: var(--text-muted);
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header-controls {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .config-panel {
+                max-height: 90vh;
+            }
+
+            .media-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--border-light);
+        }
+    </style>
+</head>
+<body>
+    <!-- PWA Install Banner -->
+    <div class="install-banner" id="installBanner">
+        <div class="install-banner-content">
+            <div class="install-banner-icon">F</div>
+            <div class="install-banner-text">
+                <h4>Instalar Feed Me Up</h4>
+                <p>Accede rápido desde tu pantalla de inicio</p>
+            </div>
+        </div>
+        <div class="install-banner-actions">
+            <button class="install-btn install-btn-secondary" onclick="dismissInstall()">Ahora no</button>
+            <button class="install-btn install-btn-primary" onclick="installPWA()">Instalar</button>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>Feed Me <span>Up</span></h1>
+                <span class="logo-tag">Noticias España</span>
+            </div>
+            <div class="header-controls">
+                <div class="status-indicator">
+                    <div class="status-dot" id="statusDot"></div>
+                    <span id="statusText">Conectado</span>
+                </div>
+                <button class="btn btn-secondary" onclick="openConfig()">⚙️ Medios</button>
+                <button class="btn btn-primary" onclick="refreshNews()" id="refreshBtn">🔄 Actualizar</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Category Navigation -->
+    <nav class="category-nav">
+        <div class="category-nav-inner" id="categoryNav"></div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="news-grid" id="newsGrid"></div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Feed Me Up v3.0 — Developed by <a href="https://www.linkedin.com/in/miguelperezplanas" target="_blank" rel="noopener">Miguel Pérez Planas</a></p>
+    </footer>
+
+    <!-- Config Modal -->
+    <div class="config-overlay" id="configOverlay" onclick="closeConfigOnOverlay(event)">
+        <div class="config-panel">
+            <div class="config-header">
+                <h2>⚙️ Configurar Medios</h2>
+                <button class="config-close" onclick="closeConfig()">✕</button>
+            </div>
+            <div class="config-body" id="configBody"></div>
+        </div>
+    </div>
+
+    <!-- Article Modal -->
+    <div class="article-overlay" id="articleOverlay" onclick="closeArticleOnOverlay(event)">
+        <div class="article-panel" id="articlePanel"></div>
+    </div>
+
+    <script>
+        // ===========================================
+        // PWA INSTALL
+        // ===========================================
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (!localStorage.getItem('pwa_dismissed')) {
+                setTimeout(() => {
+                    document.getElementById('installBanner').classList.add('show');
+                }, 3000);
+            }
+        });
+
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((result) => {
+                    document.getElementById('installBanner').classList.remove('show');
+                    deferredPrompt = null;
+                });
+            }
+        }
+
+        function dismissInstall() {
+            document.getElementById('installBanner').classList.remove('show');
+            localStorage.setItem('pwa_dismissed', 'true');
+        }
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                const swCode = `
+                    const CACHE_NAME = 'feedmeup-v3';
+                    self.addEventListener('install', e => self.skipWaiting());
+                    self.addEventListener('activate', e => e.waitUntil(clients.claim()));
+                    self.addEventListener('fetch', e => {
+                        if (e.request.url.includes('api.rss2json.com') || e.request.url.includes('fonts.')) {
+                            e.respondWith(
+                                caches.open(CACHE_NAME).then(cache => 
+                                    cache.match(e.request).then(r => r || fetch(e.request).then(res => {
+                                        if (res.ok) cache.put(e.request, res.clone());
+                                        return res;
+                                    }))
+                                )
+                            );
+                        }
+                    });
+                `;
+                const swBlob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(swBlob);
+                navigator.serviceWorker.register(swUrl).catch(() => {});
+            });
+        }
+
+        // ===========================================
+        // MEDIA SOURCES
+        // ===========================================
+        const MEDIA_SOURCES = {
+            prensa: {
+                name: 'Prensa Generalista',
+                sources: [
+                    { id: 'elpais', name: 'El País', rss: 'https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/portada', enabled: true },
+                    { id: 'elmundo', name: 'El Mundo', rss: 'https://e00-elmundo.uecdn.es/elmundo/rss/portada.xml', enabled: true },
+                    { id: 'abc', name: 'ABC', rss: 'https://www.abc.es/rss/2.0/portada/', enabled: true },
+                    { id: 'lavanguardia', name: 'La Vanguardia', rss: 'https://www.lavanguardia.com/rss/home.xml', enabled: true },
+                    { id: 'elperiodico', name: 'El Periódico', rss: 'https://www.elperiodico.com/es/rss/rss_portada.xml', enabled: false },
+                    { id: 'larazon', name: 'La Razón', rss: 'https://www.larazon.es/rss/portada.xml', enabled: false },
+                    { id: 'lavozgalicia', name: 'La Voz de Galicia', rss: 'https://www.lavozdegalicia.es/sitemap/rss/portada.xml', enabled: false }
+                ]
+            },
+            digital: {
+                name: 'Prensa Digital',
+                sources: [
+                    { id: 'elespanol', name: 'El Español', rss: 'https://www.elespanol.com/rss', enabled: true },
+                    { id: 'eldiario', name: 'elDiario.es', rss: 'https://www.eldiario.es/rss', enabled: true },
+                    { id: 'elconfidencial', name: 'El Confidencial', rss: 'https://rss.elconfidencial.com/espana/', enabled: false },
+                    { id: 'okdiario', name: 'OKDiario', rss: 'https://okdiario.com/feed', enabled: false },
+                    { id: 'libertaddigital', name: 'Libertad Digital', rss: 'https://rss.libertaddigital.com/libertaddigital/portada', enabled: false },
+                    { id: '20minutos', name: '20 Minutos', rss: 'https://www.20minutos.es/rss/', enabled: true },
+                    { id: 'publico', name: 'Público', rss: 'https://www.publico.es/rss/', enabled: false },
+                    { id: 'infolibre', name: 'InfoLibre', rss: 'https://www.infolibre.es/uploads/rss/contenidos.xml', enabled: false }
+                ]
+            },
+            independientes: {
+                name: '📢 Medios Independientes',
+                sources: [
+                    { id: 'elsalto', name: 'El Salto', rss: 'https://www.elsaltodiario.com/feed', enabled: true },
+                    { id: 'lamarea', name: 'La Marea', rss: 'https://www.lamarea.com/feed/', enabled: true },
+                    { id: 'ctxt', name: 'CTXT', rss: 'https://ctxt.es/es/rss/ctxt.xml', enabled: true },
+                    { id: 'cuartopoder', name: 'Cuarto Poder', rss: 'https://www.cuartopoder.es/feed/', enabled: false },
+                    { id: 'pikara', name: 'Píkara Magazine', rss: 'https://www.pikaramagazine.com/feed/', enabled: false },
+                    { id: 'alternativas', name: 'Alternativas Económicas', rss: 'https://alternativaseconomicas.coop/feed', enabled: false }
+                ]
+            },
+            catalan: {
+                name: '🏴 Prensa en Catalán',
+                sources: [
+                    { id: 'ara', name: 'Ara', rss: 'https://www.ara.cat/rss', enabled: false },
+                    { id: 'vilaweb', name: 'Vilaweb', rss: 'https://www.vilaweb.cat/rss.xml', enabled: false },
+                    { id: 'elcritic', name: 'El Crític', rss: 'https://www.elcritic.cat/feed', enabled: false },
+                    { id: 'directa', name: 'La Directa', rss: 'https://directa.cat/feed/', enabled: false },
+                    { id: 'naciodigital', name: 'NacióDigital', rss: 'https://www.naciodigital.cat/rss', enabled: false }
+                ]
+            },
+            economia: {
+                name: 'Economía',
+                sources: [
+                    { id: 'expansion', name: 'Expansión', rss: 'https://e00-expansion.uecdn.es/rss/portada.xml', enabled: true },
+                    { id: 'cincodias', name: 'Cinco Días', rss: 'https://cincodias.elpais.com/rss/cincodias/portada.xml', enabled: false },
+                    { id: 'eleconomista', name: 'El Economista', rss: 'https://www.eleconomista.es/rss/rss-seleccion-ee.php', enabled: false }
+                ]
+            },
+            deportes: {
+                name: 'Deportes',
+                sources: [
+                    { id: 'marca', name: 'Marca', rss: 'https://e00-marca.uecdn.es/rss/portada.xml', enabled: false },
+                    { id: 'as', name: 'AS', rss: 'https://as.com/rss/tags/ultimas_noticias.xml', enabled: false },
+                    { id: 'mundodeportivo', name: 'Mundo Deportivo', rss: 'https://www.mundodeportivo.com/rss/home.xml', enabled: false }
+                ]
+            },
+            tv: {
+                name: 'TV / Radio',
+                sources: [
+                    { id: 'rtve', name: 'RTVE Noticias', rss: 'https://www.rtve.es/api/noticias.xml', enabled: true },
+                    { id: 'cadenaser', name: 'Cadena SER', rss: 'https://cadenaser.com/rss/', enabled: false },
+                    { id: 'cope', name: 'COPE', rss: 'https://www.cope.es/rss/portada.xml', enabled: false }
+                ]
+            }
+        };
+
+        // ===========================================
+        // CATEGORÍAS Y SISTEMA DE MAPEO MEJORADO
+        // ===========================================
+        const CATEGORIES = [
+            { id: 'todas', name: 'Todas', icon: '📰' },
+            { id: 'politica', name: 'Política', icon: '🏛️' },
+            { id: 'economia', name: 'Economía', icon: '💰' },
+            { id: 'internacional', name: 'Internacional', icon: '🌍' },
+            { id: 'sociedad', name: 'Sociedad', icon: '👥' },
+            { id: 'sucesos', name: 'Sucesos', icon: '🚨' },
+            { id: 'deportes', name: 'Deportes', icon: '⚽' },
+            { id: 'cultura', name: 'Cultura', icon: '🎭' },
+            { id: 'tecnologia', name: 'Tecnología', icon: '💻' },
+            { id: 'ciencia', name: 'Ciencia', icon: '🔬' },
+            { id: 'opinion', name: 'Opinión', icon: '💬' },
+            { id: 'otras', name: 'Otras', icon: '📄' }
+        ];
+
+        // Mapeo exhaustivo de categorías RSS españolas → categorías internas
+        // Se normalizan a minúsculas para comparación
+        const CATEGORY_RSS_MAP = {
+            // === POLÍTICA ===
+            'política': 'politica',
+            'politica': 'politica',
+            'politics': 'politica',
+            'españa': 'politica',
+            'espana': 'politica',
+            'spain': 'politica',
+            'nacional': 'politica',
+            'gobierno': 'politica',
+            'congreso': 'politica',
+            'elecciones': 'politica',
+            'partidos': 'politica',
+            'parlamento': 'politica',
+            'comunidades': 'politica',
+            'autonomías': 'politica',
+            'cataluña': 'politica',
+            'catalunya': 'politica',
+            'madrid': 'politica',
+            'andalucía': 'politica',
+            'país vasco': 'politica',
+            'galicia': 'politica',
+            'valencia': 'politica',
+            
+            // === ECONOMÍA ===
+            'economía': 'economia',
+            'economia': 'economia',
+            'economy': 'economia',
+            'business': 'economia',
+            'negocios': 'economia',
+            'empresas': 'economia',
+            'mercados': 'economia',
+            'finanzas': 'economia',
+            'bolsa': 'economia',
+            'dinero': 'economia',
+            'trabajo': 'economia',
+            'empleo': 'economia',
+            'laboral': 'economia',
+            'pymes': 'economia',
+            'banca': 'economia',
+            'banking': 'economia',
+            'ibex': 'economia',
+            'inversión': 'economia',
+            'inmobiliario': 'economia',
+            'vivienda': 'economia',
+            
+            // === INTERNACIONAL ===
+            'internacional': 'internacional',
+            'international': 'internacional',
+            'mundo': 'internacional',
+            'world': 'internacional',
+            'europa': 'internacional',
+            'europe': 'internacional',
+            'eeuu': 'internacional',
+            'usa': 'internacional',
+            'estados unidos': 'internacional',
+            'latinoamérica': 'internacional',
+            'américa latina': 'internacional',
+            'asia': 'internacional',
+            'áfrica': 'internacional',
+            'oriente medio': 'internacional',
+            'middle east': 'internacional',
+            'global': 'internacional',
+            'diplomacia': 'internacional',
+            'geopolítica': 'internacional',
+            
+            // === SOCIEDAD ===
+            'sociedad': 'sociedad',
+            'society': 'sociedad',
+            'social': 'sociedad',
+            'educación': 'sociedad',
+            'education': 'sociedad',
+            'sanidad': 'sociedad',
+            'salud': 'sociedad',
+            'health': 'sociedad',
+            'justicia': 'sociedad',
+            'tribunales': 'sociedad',
+            'inmigración': 'sociedad',
+            'migración': 'sociedad',
+            'igualdad': 'sociedad',
+            'género': 'sociedad',
+            'feminismo': 'sociedad',
+            'familia': 'sociedad',
+            'consumo': 'sociedad',
+            'medio ambiente': 'sociedad',
+            'medioambiente': 'sociedad',
+            'ecología': 'sociedad',
+            'sostenibilidad': 'sociedad',
+            'climate': 'sociedad',
+            'gente': 'sociedad',
+            'people': 'sociedad',
+            'vida': 'sociedad',
+            'life': 'sociedad',
+            
+            // === SUCESOS (NUEVO - para accidentes, emergencias, etc) ===
+            'sucesos': 'sucesos',
+            'accidentes': 'sucesos',
+            'accidents': 'sucesos',
+            'emergencias': 'sucesos',
+            'emergency': 'sucesos',
+            'incendios': 'sucesos',
+            'fire': 'sucesos',
+            'crimen': 'sucesos',
+            'crime': 'sucesos',
+            'delitos': 'sucesos',
+            'policial': 'sucesos',
+            'police': 'sucesos',
+            'seguridad': 'sucesos',
+            'security': 'sucesos',
+            'tráfico': 'sucesos',
+            'traffic': 'sucesos',
+            'desastres': 'sucesos',
+            'disaster': 'sucesos',
+            'catástrofes': 'sucesos',
+            'meteorología': 'sucesos',
+            'weather': 'sucesos',
+            'tiempo': 'sucesos',
+            'tormentas': 'sucesos',
+            'inundaciones': 'sucesos',
+            
+            // === DEPORTES ===
+            'deportes': 'deportes',
+            'deporte': 'deportes',
+            'sports': 'deportes',
+            'sport': 'deportes',
+            'fútbol': 'deportes',
+            'futbol': 'deportes',
+            'football': 'deportes',
+            'soccer': 'deportes',
+            'liga': 'deportes',
+            'champions': 'deportes',
+            'baloncesto': 'deportes',
+            'basketball': 'deportes',
+            'nba': 'deportes',
+            'tenis': 'deportes',
+            'tennis': 'deportes',
+            'f1': 'deportes',
+            'formula 1': 'deportes',
+            'motor': 'deportes',
+            'motorsport': 'deportes',
+            'ciclismo': 'deportes',
+            'cycling': 'deportes',
+            'atletismo': 'deportes',
+            'athletics': 'deportes',
+            'olimpiadas': 'deportes',
+            'olympics': 'deportes',
+            'golf': 'deportes',
+            'natación': 'deportes',
+            
+            // === CULTURA ===
+            'cultura': 'cultura',
+            'culture': 'cultura',
+            'cultural': 'cultura',
+            'arte': 'cultura',
+            'art': 'cultura',
+            'arts': 'cultura',
+            'cine': 'cultura',
+            'cinema': 'cultura',
+            'film': 'cultura',
+            'movies': 'cultura',
+            'películas': 'cultura',
+            'música': 'cultura',
+            'music': 'cultura',
+            'teatro': 'cultura',
+            'theater': 'cultura',
+            'theatre': 'cultura',
+            'literatura': 'cultura',
+            'literature': 'cultura',
+            'libros': 'cultura',
+            'books': 'cultura',
+            'series': 'cultura',
+            'televisión': 'cultura',
+            'television': 'cultura',
+            'tv': 'cultura',
+            'entretenimiento': 'cultura',
+            'entertainment': 'cultura',
+            'ocio': 'cultura',
+            'leisure': 'cultura',
+            'espectáculos': 'cultura',
+            'shows': 'cultura',
+            'festivales': 'cultura',
+            'conciertos': 'cultura',
+            'exposiciones': 'cultura',
+            'museos': 'cultura',
+            'moda': 'cultura',
+            'fashion': 'cultura',
+            'tendencias': 'cultura',
+            'estilo': 'cultura',
+            'style': 'cultura',
+            'gastronomía': 'cultura',
+            'gastronomy': 'cultura',
+            'food': 'cultura',
+            'cocina': 'cultura',
+            'viajes': 'cultura',
+            'travel': 'cultura',
+            
+            // === TECNOLOGÍA ===
+            'tecnología': 'tecnologia',
+            'tecnologia': 'tecnologia',
+            'technology': 'tecnologia',
+            'tech': 'tecnologia',
+            'digital': 'tecnologia',
+            'internet': 'tecnologia',
+            'apps': 'tecnologia',
+            'aplicaciones': 'tecnologia',
+            'software': 'tecnologia',
+            'hardware': 'tecnologia',
+            'gadgets': 'tecnologia',
+            'móviles': 'tecnologia',
+            'smartphones': 'tecnologia',
+            'redes sociales': 'tecnologia',
+            'social media': 'tecnologia',
+            'ciberseguridad': 'tecnologia',
+            'cybersecurity': 'tecnologia',
+            'startups': 'tecnologia',
+            'innovación': 'tecnologia',
+            'innovation': 'tecnologia',
+            'videojuegos': 'tecnologia',
+            'gaming': 'tecnologia',
+            'games': 'tecnologia',
+            
+            // === CIENCIA ===
+            'ciencia': 'ciencia',
+            'science': 'ciencia',
+            'científico': 'ciencia',
+            'scientific': 'ciencia',
+            'investigación': 'ciencia',
+            'research': 'ciencia',
+            'espacio': 'ciencia',
+            'space': 'ciencia',
+            'astronomía': 'ciencia',
+            'astronomy': 'ciencia',
+            'física': 'ciencia',
+            'physics': 'ciencia',
+            'química': 'ciencia',
+            'chemistry': 'ciencia',
+            'biología': 'ciencia',
+            'biology': 'ciencia',
+            'medicina': 'ciencia',
+            'medicine': 'ciencia',
+            'medical': 'ciencia',
+            'salud': 'ciencia',
+            'naturaleza': 'ciencia',
+            'nature': 'ciencia',
+            'animales': 'ciencia',
+            'animals': 'ciencia',
+            'inteligencia artificial': 'ciencia',
+            'ia': 'ciencia',
+            'ai': 'ciencia',
+            'artificial intelligence': 'ciencia',
+            'robótica': 'ciencia',
+            'robotics': 'ciencia',
+            
+            // === OPINIÓN ===
+            'opinión': 'opinion',
+            'opinion': 'opinion',
+            'editorial': 'opinion',
+            'editoriales': 'opinion',
+            'columnistas': 'opinion',
+            'columnists': 'opinion',
+            'análisis': 'opinion',
+            'analysis': 'opinion',
+            'tribuna': 'opinion',
+            'cartas': 'opinion',
+            'letters': 'opinion',
+            'blogs': 'opinion',
+            'firmas': 'opinion'
+        };
+
+        // Keywords para fallback cuando no hay categorías RSS
+        const CATEGORY_KEYWORDS = {
+            'politica': ['gobierno', 'ministro', 'presidente', 'congreso', 'senado', 'elecciones', 'psoe', 'pp', 'vox', 'podemos', 'sumar', 'parlamento', 'ley', 'diputado', 'sánchez', 'feijóo', 'ayuso', 'moncloa', 'constitución', 'autonomía', 'generalitat'],
+            'economia': ['ibex', 'bolsa', 'mercados', 'empleo', 'paro', 'inflación', 'pib', 'banco', 'euro', 'empresa', 'inversión', 'finanzas', 'hipoteca', 'pensiones', 'salario', 'impuestos', 'hacienda', 'deuda', 'recesión', 'crecimiento'],
+            'internacional': ['eeuu', 'trump', 'biden', 'ucrania', 'rusia', 'putin', 'china', 'gaza', 'israel', 'palestina', 'guerra', 'onu', 'otan', 'ue', 'bruselas', 'macron', 'reino unido', 'brexit', 'irán', 'corea'],
+            'sociedad': ['educación', 'sanidad', 'hospital', 'vivienda', 'alquiler', 'inmigración', 'feminismo', 'igualdad', 'familia', 'juventud', 'mayores', 'discapacidad', 'pobreza', 'exclusión', 'ong'],
+            'sucesos': ['accidente', 'muerto', 'muertos', 'fallecido', 'herido', 'heridos', 'incendio', 'explosión', 'detenido', 'asesinato', 'homicidio', 'robo', 'atraco', 'violación', 'agresión', 'tren', 'avión', 'coche', 'carretera', 'emergencia', 'rescate', 'inundación', 'terremoto', 'tormenta', 'dana', 'temporal', 'nieve', 'ola de calor'],
+            'deportes': ['fútbol', 'liga', 'champions', 'barça', 'barcelona', 'madrid', 'real madrid', 'atlético', 'tenis', 'nadal', 'alcaraz', 'f1', 'moto gp', 'baloncesto', 'euroliga', 'tour', 'vuelta', 'giro', 'olimpiadas', 'mundial', 'eurocopa'],
+            'cultura': ['cine', 'película', 'música', 'concierto', 'teatro', 'arte', 'libro', 'novela', 'netflix', 'serie', 'festival', 'premio', 'goya', 'oscar', 'museo', 'exposición', 'moda', 'diseño', 'gastronomía', 'restaurante'],
+            'tecnologia': ['inteligencia artificial', 'ia', 'ai', 'chatgpt', 'openai', 'google', 'microsoft', 'apple', 'iphone', 'android', 'app', 'red social', 'twitter', 'instagram', 'tiktok', 'meta', 'facebook', 'ciberseguridad', 'hacker', 'startup', 'videojuego'],
+            'ciencia': ['científico', 'investigador', 'nasa', 'espacio', 'marte', 'luna', 'satélite', 'telescopio', 'clima', 'cambio climático', 'co2', 'emisiones', 'vacuna', 'virus', 'bacteria', 'adn', 'genética', 'fósil', 'dinosaurio', 'neurociencia'],
+            'opinion': ['editorial', 'columna', 'tribuna', 'análisis', 'reflexión', 'carta al director', 'opinión de']
+        };
+
+        let allNews = [];
+        let currentCategory = 'todas';
+        let autoRefreshInterval = null;
+        const AUTO_REFRESH_MS = 10 * 60 * 1000;
+        const RSS2JSON_API = 'https://api.rss2json.com/v1/api.json?rss_url=';
+
+        // ===========================================
+        // CORE FUNCTIONS
+        // ===========================================
+        async function init() {
+            loadSavedConfig();
+            renderConfigPanel();
+            renderCategoryNav();
+            await refreshNews();
+            startAutoRefresh();
+        }
+
+        function loadSavedConfig() {
+            const saved = localStorage.getItem('feedmeup_config_v3');
+            if (saved) {
+                try {
+                    const config = JSON.parse(saved);
+                    for (const type in MEDIA_SOURCES) {
+                        MEDIA_SOURCES[type].sources.forEach(source => {
+                            if (config[source.id] !== undefined) source.enabled = config[source.id];
+                        });
+                    }
+                } catch (e) {}
+            }
+        }
+
+        function saveConfig() {
+            const config = {};
+            for (const type in MEDIA_SOURCES) {
+                MEDIA_SOURCES[type].sources.forEach(s => config[s.id] = s.enabled);
+            }
+            localStorage.setItem('feedmeup_config_v3', JSON.stringify(config));
+        }
+
+        function getEnabledSources() {
+            const enabled = [];
+            for (const type in MEDIA_SOURCES) {
+                MEDIA_SOURCES[type].sources.forEach(s => { if (s.enabled) enabled.push(s); });
+            }
+            return enabled;
+        }
+
+        async function refreshNews() {
+            const btn = document.getElementById('refreshBtn');
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            
+            btn.disabled = true;
+            statusDot.className = 'status-dot loading';
+            statusText.textContent = 'Actualizando...';
+
+            const sources = getEnabledSources();
+            
+            if (sources.length === 0) {
+                showEmptyState('Sin medios', 'Selecciona medios en ⚙️');
+                btn.disabled = false;
+                statusDot.className = 'status-dot error';
+                statusText.textContent = 'Sin medios';
+                return;
+            }
+
+            showLoadingState();
+
+            const results = await Promise.allSettled(sources.map(s => fetchRSS(s)));
+
+            allNews = [];
+            let successCount = 0;
+
+            results.forEach((r) => {
+                if (r.status === 'fulfilled' && r.value) {
+                    allNews = allNews.concat(r.value);
+                    successCount++;
+                }
+            });
+
+            allNews.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+
+            renderCategoryNav();
+            renderNews();
+
+            btn.disabled = false;
+
+            if (successCount > 0) {
+                statusDot.className = 'status-dot';
+                statusText.textContent = formatTime(new Date());
+            } else {
+                statusDot.className = 'status-dot error';
+                statusText.textContent = 'Error';
+            }
+        }
+
+        async function fetchRSS(source) {
+            try {
+                const response = await fetch(RSS2JSON_API + encodeURIComponent(source.rss));
+                if (!response.ok) throw new Error();
+                const data = await response.json();
+                if (data.status !== 'ok' || !data.items) return null;
+
+                return data.items.slice(0, 12).map(item => ({
+                    id: Math.random().toString(36).substr(2, 9),
+                    title: cleanText(item.title),
+                    description: cleanText(item.description),
+                    link: item.link,
+                    pubDate: item.pubDate,
+                    source: source.name,
+                    sourceId: source.id,
+                    // NUEVO: Detectar categoría usando tags RSS + fallback a keywords
+                    category: detectCategoryImproved(item.categories, item.title, item.description),
+                    // Guardar categorías originales para debug
+                    originalCategories: item.categories || []
+                }));
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // ===========================================
+        // SISTEMA DE CATEGORIZACIÓN MEJORADO
+        // ===========================================
+        
+        /**
+         * Detecta la categoría usando:
+         * 1. PRIMERO: Tags/categorías del RSS (fuente más fiable)
+         * 2. FALLBACK: Keywords en título/descripción
+         */
+        function detectCategoryImproved(rssCategories, title, description) {
+            // 1. Intentar con categorías RSS primero
+            if (rssCategories && Array.isArray(rssCategories) && rssCategories.length > 0) {
+                for (const rssCat of rssCategories) {
+                    const normalized = rssCat.toLowerCase().trim();
+                    
+                    // Buscar coincidencia exacta en el mapeo
+                    if (CATEGORY_RSS_MAP[normalized]) {
+                        return CATEGORY_RSS_MAP[normalized];
+                    }
+                    
+                    // Buscar coincidencia parcial (para categorías compuestas como "Política/España")
+                    for (const [key, value] of Object.entries(CATEGORY_RSS_MAP)) {
+                        if (normalized.includes(key) || key.includes(normalized)) {
+                            return value;
+                        }
+                    }
+                }
+            }
+            
+            // 2. Fallback: Buscar keywords en título y descripción
+            const text = ((title || '') + ' ' + (description || '')).toLowerCase();
+            
+            // Primero buscar sucesos (tienen prioridad porque son específicos)
+            if (detectKeywordsInText(text, CATEGORY_KEYWORDS['sucesos'])) {
+                return 'sucesos';
+            }
+            
+            // Luego el resto de categorías
+            const categoryOrder = ['deportes', 'tecnologia', 'ciencia', 'cultura', 'economia', 'internacional', 'politica', 'sociedad', 'opinion'];
+            
+            for (const catId of categoryOrder) {
+                if (CATEGORY_KEYWORDS[catId] && detectKeywordsInText(text, CATEGORY_KEYWORDS[catId])) {
+                    return catId;
+                }
+            }
+            
+            return 'otras';
+        }
+        
+        /**
+         * Detecta si alguna keyword está presente en el texto
+         * Usa word boundaries para evitar falsos positivos
+         */
+        function detectKeywordsInText(text, keywords) {
+            for (const kw of keywords) {
+                // Crear regex con word boundaries para coincidencias más precisas
+                const regex = new RegExp('\\b' + escapeRegex(kw) + '\\b', 'i');
+                if (regex.test(text)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        /**
+         * Escapa caracteres especiales para uso en regex
+         */
+        function escapeRegex(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        // ===========================================
+        // RENDER
+        // ===========================================
+        function renderCategoryNav() {
+            const nav = document.getElementById('categoryNav');
+            const counts = { todas: allNews.length };
+            CATEGORIES.forEach(c => { if (c.id !== 'todas') counts[c.id] = allNews.filter(n => n.category === c.id).length; });
+
+            nav.innerHTML = CATEGORIES.map(c => `
+                <button class="category-tab ${currentCategory === c.id ? 'active' : ''}" 
+                        onclick="filterByCategory('${c.id}')"
+                        ${counts[c.id] === 0 && c.id !== 'todas' ? 'style="opacity:0.5"' : ''}>
+                    ${c.icon} ${c.name}
+                    <span class="category-count">${counts[c.id] || 0}</span>
+                </button>
+            `).join('');
+        }
+
+        function renderNews() {
+            const grid = document.getElementById('newsGrid');
+            let filtered = currentCategory === 'todas' ? allNews : allNews.filter(n => n.category === currentCategory);
+
+            if (filtered.length === 0) {
+                showEmptyState(currentCategory === 'todas' ? 'Sin noticias' : `Sin noticias de ${getCategoryName(currentCategory)}`, 'Activa más medios o cambia categoría');
+                return;
+            }
+
+            grid.innerHTML = filtered.map(n => `
+                <article class="news-card" onclick="openArticle('${n.id}')">
+                    <div class="news-card-header">
+                        <div class="news-source">
+                            <div class="source-icon">${getSourceInitials(n.source)}</div>
+                            <span class="source-name">${n.source}</span>
+                        </div>
+                        <span class="news-time">${formatRelativeTime(n.pubDate)}</span>
+                    </div>
+                    <h3>${n.title}</h3>
+                    ${n.description ? `<p>${n.description}</p>` : ''}
+                    <div class="news-card-footer">
+                        <span class="news-category-tag">${getCategoryName(n.category)}</span>
+                        <span class="news-link">→</span>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        function showLoadingState() {
+            document.getElementById('newsGrid').innerHTML = `
+                <div class="state-container" style="grid-column:1/-1;">
+                    <div class="loading-spinner"></div>
+                    <h3>Cargando noticias...</h3>
+                </div>
+            `;
+        }
+
+        function showEmptyState(title, msg) {
+            document.getElementById('newsGrid').innerHTML = `
+                <div class="state-container" style="grid-column:1/-1;">
+                    <div class="state-icon">📭</div>
+                    <h3>${title}</h3>
+                    <p>${msg}</p>
+                </div>
+            `;
+        }
+
+        function renderConfigPanel() {
+            const body = document.getElementById('configBody');
+            let html = '';
+            for (const type in MEDIA_SOURCES) {
+                const g = MEDIA_SOURCES[type];
+                html += `
+                    <div class="config-section">
+                        <h3>${g.name}</h3>
+                        <div class="media-grid">
+                            ${g.sources.map(s => `
+                                <div class="media-item ${s.enabled ? 'selected' : ''}" onclick="toggleSource('${type}','${s.id}')">
+                                    <div class="media-checkbox"></div>
+                                    <div class="media-info">
+                                        <div class="media-name">${s.name}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="config-actions">
+                            <button class="config-action-btn" onclick="selectAllInGroup('${type}')">✓ Todos</button>
+                            <button class="config-action-btn" onclick="deselectAllInGroup('${type}')">✗ Ninguno</button>
+                        </div>
+                    </div>
+                `;
+            }
+            body.innerHTML = html;
+        }
+
+        // ===========================================
+        // INTERACTIONS
+        // ===========================================
+        function filterByCategory(id) {
+            currentCategory = id;
+            renderCategoryNav();
+            renderNews();
+        }
+
+        function toggleSource(type, id) {
+            const s = MEDIA_SOURCES[type].sources.find(x => x.id === id);
+            if (s) { s.enabled = !s.enabled; saveConfig(); renderConfigPanel(); }
+        }
+
+        function selectAllInGroup(type) {
+            MEDIA_SOURCES[type].sources.forEach(s => s.enabled = true);
+            saveConfig(); renderConfigPanel();
+        }
+
+        function deselectAllInGroup(type) {
+            MEDIA_SOURCES[type].sources.forEach(s => s.enabled = false);
+            saveConfig(); renderConfigPanel();
+        }
+
+        function openConfig() {
+            document.getElementById('configOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeConfig() {
+            document.getElementById('configOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+            refreshNews();
+        }
+
+        function closeConfigOnOverlay(e) {
+            if (e.target.id === 'configOverlay') closeConfig();
+        }
+
+        function openArticle(id) {
+            const n = allNews.find(x => x.id === id);
+            if (!n) return;
+
+            document.getElementById('articlePanel').innerHTML = `
+                <div class="article-header">
+                    <div class="article-meta">
+                        <div class="article-source-badge">
+                            <div class="source-icon">${getSourceInitials(n.source)}</div>
+                            <span class="source-name">${n.source}</span>
+                        </div>
+                        <span class="news-time">${formatRelativeTime(n.pubDate)}</span>
+                    </div>
+                    <h2>${n.title}</h2>
+                </div>
+                <div class="article-body">
+                    ${n.description ? `<p class="article-description">${n.description}</p>` : ''}
+                    <div class="article-actions">
+                        <a href="${n.link}" target="_blank" rel="noopener" class="article-link-btn">🔗 Leer artículo</a>
+                        <button class="article-close-btn" onclick="closeArticle()">Cerrar</button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('articleOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeArticle() {
+            document.getElementById('articleOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function closeArticleOnOverlay(e) {
+            if (e.target.id === 'articleOverlay') closeArticle();
+        }
+
+        function startAutoRefresh() {
+            if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+            autoRefreshInterval = setInterval(refreshNews, AUTO_REFRESH_MS);
+        }
+
+        // ===========================================
+        // UTILS
+        // ===========================================
+        function cleanText(t) {
+            if (!t) return '';
+            return t.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\s+/g, ' ').trim().slice(0, 400);
+        }
+
+        function getSourceInitials(n) {
+            return n.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+        }
+
+        function getCategoryName(id) {
+            const c = CATEGORIES.find(x => x.id === id);
+            return c ? c.name : 'Otras';
+        }
+
+        function formatRelativeTime(d) {
+            const date = new Date(d);
+            const diff = Date.now() - date;
+            const mins = Math.floor(diff / 60000);
+            const hrs = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            if (mins < 1) return 'Ahora';
+            if (mins < 60) return `${mins}m`;
+            if (hrs < 24) return `${hrs}h`;
+            if (days < 7) return `${days}d`;
+            return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+        }
+
+        function formatTime(d) {
+            return d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') { closeConfig(); closeArticle(); }
+            if (e.key === 'r' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); refreshNews(); }
+        });
+
+        // Init
+        init();
+    </script>
+</body>
+</html>
